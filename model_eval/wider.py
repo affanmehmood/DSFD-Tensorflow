@@ -17,7 +17,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--model", required=False, default='../model/detector.pb', help="model to eval:")
 ap.add_argument("--is_show", required=False, default=False, help="show result or not?")
 ap.add_argument("--data_dir", required=False, default="../WIDER/WIDER_val", help="dir to img")
-ap.add_argument("--result", required=True, default='./resultWILDER', help="dir to write result")
+ap.add_argument("--result", required=False, default='./resultWILDER', help="dir to write result")
 args = ap.parse_args()
 
 IMAGES_DIR = args.data_dir
@@ -31,10 +31,10 @@ def get_data():
     subset = 'val'
     if subset is 'val':
         wider_face = sio.loadmat(
-            './eval_tools/ground_truth/wider_face_val.mat')
+            '../eval_tools/ground_truth/wider_face_val.mat')
     else:
         wider_face = sio.loadmat(
-            './eval_tools/ground_truth/wider_face_test.mat')
+            '../eval_tools/ground_truth/wider_face_val.mat')
     event_list = wider_face['event_list']
     file_list = wider_face['file_list']
     del wider_face
@@ -157,7 +157,6 @@ for index, event in enumerate(event_list):
     for num, file in enumerate(filelist):
         im_name = file[0][0]
         in_file = os.path.join(imgs_path, event[0][0], im_name[:] + '.jpg')
-
         image_array = cv2.imread(in_file)
         img = cv2.cvtColor(image_array, cv2.COLOR_BGR2RGB)
 

@@ -1,5 +1,6 @@
-#-*-coding:utf-8-*-
+# -*-coding:utf-8-*-
 import sys
+
 sys.path.append('.')
 import numpy as np
 import os
@@ -12,13 +13,12 @@ from lib.core.api.face_detector import FaceDetector
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 ap = argparse.ArgumentParser()
-ap.add_argument( "--model", required=False, default='../model/detector.pb', help="model to eval:")
-ap.add_argument( "--is_show", required=False, default=False, help="show result or not?")
-ap.add_argument( "--data_dir", required=False, default="../FDDB/fddb_images", help="dir to img")
-ap.add_argument( "--split_dir", required=False, default='../FDDB/FDDB-folds', help="dir to FDDB-folds")
-ap.add_argument( "--result", required=False, default='./resultFDDB', help="dir to write result")
+ap.add_argument("--model", required=False, default='../model/detector.pb', help="model to eval:")
+ap.add_argument("--is_show", required=False, default=False, help="show result or not?")
+ap.add_argument("--data_dir", required=False, default="../FDDB/fddb_images", help="dir to img")
+ap.add_argument("--split_dir", required=False, default='../FDDB/FDDB-folds', help="dir to FDDB-folds")
+ap.add_argument("--result", required=False, default='./resultFDDB', help="dir to write result")
 args = ap.parse_args()
-
 
 IMAGES_DIR = args.data_dir
 ANNOTATIONS_PATH = args.split_dir
@@ -26,7 +26,6 @@ RESULT_DIR = args.result
 MODEL_PATH = args.model
 
 face_detector = FaceDetector([MODEL_PATH])
-
 
 annotations = [s for s in os.listdir(ANNOTATIONS_PATH) if s.endswith('ellipseList.txt')]
 image_lists = [s for s in os.listdir(ANNOTATIONS_PATH) if not s.endswith('ellipseList.txt')]
@@ -43,7 +42,6 @@ with open(os.path.join(RESULT_DIR, 'faceList.txt'), 'w') as f:
     for p in images_to_use:
         f.write(p + '\n')
 
-
 ellipses = []
 for n in annotations:
     with open(os.path.join(ANNOTATIONS_PATH, n)) as f:
@@ -59,6 +57,7 @@ with open(os.path.join(RESULT_DIR, 'ellipseList.txt'), 'w') as f:
             i += 1
 
         f.write(p)
+
 
 def bbox_vote(det):
     order = det[:, 4].ravel().argsort()[::-1]
@@ -95,17 +94,17 @@ def bbox_vote(det):
     dets = dets[0:750, :]
     return dets
 
+
 predictions = []
 for n in tqdm(images_to_use):
     image_array = cv2.imread(os.path.join(IMAGES_DIR, n) + '.jpg')
     image_array = cv2.cvtColor(image_array, cv2.COLOR_BGR2RGB)
     # threshold is important to set low
 
-
     boxes = face_detector(image_array, score_threshold=0.05)
 
     ##flip det
-    flip_img=np.flip(image_array,1)
+    flip_img = np.flip(image_array, 1)
 
     boxes_flip_ = face_detector(flip_img, score_threshold=0.01)
     boxes_flip = np.zeros(boxes_flip_.shape)
@@ -129,12 +128,9 @@ for n in tqdm(images_to_use):
         cv2.imshow('tmp', image_array)
         cv2.waitKey(0)
 
-
     ###
 
-
-    predictions.append((n, dets[:,0:4], dets[:,4]))
-
+    predictions.append((n, dets[:, 0:4], dets[:, 4]))
 
 with open(os.path.join(RESULT_DIR, 'detections.txt'), 'w') as f:
     for n, boxes, scores in predictions:
@@ -142,7 +138,5 @@ with open(os.path.join(RESULT_DIR, 'detections.txt'), 'w') as f:
         f.write(str(len(boxes)) + '\n')
         for b, s in zip(boxes, scores):
             xmin, ymin, xmax, ymax = b
-            h, w = int(ymax - ymin+1), int(xmax - xmin+1)
+            h, w = int(ymax - ymin + 1), int(xmax - xmin + 1)
             f.write('{0} {1} {2} {3} {4:.4f}\n'.format(int(xmin), int(ymin), w, h, s))
-
-
