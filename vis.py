@@ -40,7 +40,6 @@ def face_detect():
         img_show = img.copy()
 
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        star = time.time()
         boxes = detector(img, 0.5)
 
         print(boxes.shape[0])

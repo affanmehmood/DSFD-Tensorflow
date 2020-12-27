@@ -3,3 +3,5 @@
 *.pyc
 *.pb
 *.ckpt
+*fddb_images/
+*WIDER_val/
